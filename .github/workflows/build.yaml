@@ -15,8 +15,9 @@ jobs:
             target: dmg
           - os: windows-latest  
             target: nsis
-          - os: ubuntu-latest
-            target: AppImage
+          # Commenting out Linux until we fix the issues
+          # - os: ubuntu-latest
+          #   target: AppImage
     
     runs-on: ${{ matrix.os }}
     timeout-minutes: 45
@@ -38,7 +39,6 @@ jobs:
         run: npm run dist
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        continue-on-error: false
           
       - name: Upload ${{ matrix.os }} artifacts
         uses: actions/upload-artifact@v4
@@ -56,14 +56,13 @@ jobs:
   release:
     needs: build
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/') && always()
+    if: startsWith(github.ref, 'refs/tags/')
     
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
           path: ./artifacts
-        continue-on-error: true
           
       - name: List downloaded artifacts
         run: |
@@ -76,10 +75,28 @@ jobs:
           files: |
             artifacts/**/*.exe
             artifacts/**/*.dmg
-            artifacts/**/*.AppImage
-            artifacts/**/*.deb
           generate_release_notes: true
-          fail_on_unmatched_files: false
-          draft: false
+          body: |
+            ## 🍅 Pomodoro Timer v${{ github.ref_name }}
+            
+            A minimal, beautiful Pomodoro timer desktop app.
+            
+            ### ✨ Features
+            - 25/5/25/5/25/5/25/15 Pomodoro cycles
+            - Clean, minimal dark theme interface
+            - System tray integration with 🍅 icon
+            - Keyboard shortcuts (Space to start/pause)
+            - Desktop notifications
+            - Add your own lofi music files
+            
+            ### 📥 Downloads
+            - **Windows**: Download the `.exe` installer
+            - **macOS**: Download the `.dmg` disk image
+            - **Linux**: Coming soon! 🐧
+            
+            ### 🎵 Setup Your Music
+            1. Install the app
+            2. Add `work_lofi.wav` and `break_lofi.wav` to the app folder
+            3. Restart and enjoy productive sessions!
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
