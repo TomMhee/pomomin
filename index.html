@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomodoro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a1a;
+            color: #fff;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .app {
+            background: #2a2a2a;
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            min-width: 320px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .timer {
+            font-size: 72px;
+            font-weight: 300;
+            margin: 20px 0;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+            color: #ff6b6b;
+        }
+
+        .session {
+            font-size: 18px;
+            margin-bottom: 30px;
+            color: #888;
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .btn {
+            background: #444;
+            border: none;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: #555;
+        }
+
+        .btn.primary {
+            background: #ff6b6b;
+        }
+
+        .btn.primary:hover {
+            background: #ff5252;
+        }
+
+        .volume {
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .volume input {
+            width: 100px;
+        }
+
+        .music {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            opacity: 0.6;
+        }
+
+        .work { color: #ff6b6b; }
+        .break { color: #4ecdc4; }
+        .longbreak { color: #45b7d1; }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <div class="music" id="music" style="display: none;">🎵</div>
+        
+        <div class="session" id="session">25:00 Work</div>
+        <div class="timer" id="timer">25:00</div>
+        
+        <div class="volume">
+            🔊 <input type="range" id="volume" min="0" max="100" value="50">
+        </div>
+        
+        <div class="controls">
+            <button class="btn primary" id="toggle">Start</button>
+            <button class="btn" id="skip">Skip</button>
+            <button class="btn" id="reset">Reset</button>
+        </div>
+    </div>
+
+    <script>
+        class MinimalPomodoro {
+            constructor() {
+                this.sessions = [
+                    { duration: 25, name: "Work", type: "work" },
+                    { duration: 5, name: "Break", type: "break" },
+                    { duration: 25, name: "Work", type: "work" },
+                    { duration: 5, name: "Break", type: "break" },
+                    { duration: 25, name: "Work", type: "work" },
+                    { duration: 5, name: "Break", type: "break" },
+                    { duration: 25, name: "Work", type: "work" },
+                    { duration: 15, name: "Long Break", type: "longbreak" }
+                ];
+                
+                this.current = 0;
+                this.remaining = this.sessions[0].duration * 60;
+                this.running = false;
+                this.timer = null;
+                this.audio = null;
+                this.volume = 0.5;
+                
+                this.init();
+            }
+
+            init() {
+                document.getElementById('toggle').onclick = () => this.toggle();
+                document.getElementById('skip').onclick = () => this.skip();
+                document.getElementById('reset').onclick = () => this.reset();
+                document.getElementById('volume').oninput = (e) => {
+                    this.volume = e.target.value / 100;
+                    if (this.audio) this.audio.volume = this.volume;
+                };
+                
+                document.onkeydown = (e) => {
+                    if (e.code === 'Space') {
+                        e.preventDefault();
+                        this.toggle();
+                    }
+                };
+                
+                this.update();
+            }
+
+            toggle() {
+                if (this.running) {
+                    this.pause();
+                } else {
+                    this.start();
+                }
+            }
+
+            start() {
+                this.running = true;
+                document.getElementById('toggle').textContent = 'Pause';
+                
+                this.playMusic();
+                
+                this.timer = setInterval(() => {
+                    this.remaining--;
+                    this.update();
+                    
+                    if (this.remaining <= 0) {
+                        this.complete();
+                    }
+                }, 1000);
+            }
+
+            pause() {
+                this.running = false;
+                document.getElementById('toggle').textContent = 'Start';
+                clearInterval(this.timer);
+                this.stopMusic();
+            }
+
+            skip() {
+                this.complete();
+            }
+
+            reset() {
+                this.pause();
+                this.current = 0;
+                this.remaining = this.sessions[0].duration * 60;
+                this.update();
+            }
+
+            complete() {
+                this.pause();
+                
+                // Next session
+                this.current = (this.current + 1) % this.sessions.length;
+                this.remaining = this.sessions[this.current].duration * 60;
+                this.update();
+                
+                // Notify
+                this.notify();
+                
+                // Auto-start next session after 3 seconds
+                setTimeout(() => this.start(), 3000);
+            }
+
+            update() {
+                const session = this.sessions[this.current];
+                const minutes = Math.floor(this.remaining / 60);
+                const seconds = this.remaining % 60;
+                const time = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                document.getElementById('timer').textContent = time;
+                document.getElementById('session').textContent = `${session.duration}:00 ${session.name}`;
+                document.getElementById('timer').className = `timer ${session.type}`;
+                document.title = this.running ? `${time} - ${session.name}` : 'Pomodoro';
+            }
+
+            playMusic() {
+                try {
+                    this.stopMusic();
+                    
+                    const session = this.sessions[this.current];
+                    const file = session.type === 'work' ? 'work_lofi.wav' : 'break_lofi.wav';
+                    
+                    this.audio = new Audio(file);
+                    this.audio.volume = this.volume;
+                    this.audio.loop = true;
+                    
+                    this.audio.oncanplaythrough = () => {
+                        document.getElementById('music').style.display = 'block';
+                    };
+                    
+                    this.audio.onerror = () => {
+                        document.getElementById('music').style.display = 'none';
+                    };
+                    
+                    this.audio.play().catch(() => {});
+                } catch (e) {}
+            }
+
+            stopMusic() {
+                if (this.audio) {
+                    this.audio.pause();
+                    this.audio = null;
+                }
+                document.getElementById('music').style.display = 'none';
+            }
+
+            notify() {
+                const session = this.sessions[this.current];
+                
+                if ('Notification' in window && Notification.permission === 'granted') {
+                    new Notification(`${session.name} started!`, {
+                        body: `${session.duration} minutes`,
+                        icon: '🍅'
+                    });
+                } else if ('Notification' in window && Notification.permission !== 'denied') {
+                    Notification.requestPermission();
+                }
+            }
+        }
+
+        new MinimalPomodoro();
+    </script>
+</body>
+</html>
