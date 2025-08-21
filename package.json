@@ -15,8 +15,9 @@
     "electron-builder": "^24.9.1"
   },
   "build": {
-    "appId": "com.ThomasHardcastle.pomodoro",
+    "appId": "com.Hardcastle.pomodoro",
     "productName": "Pomodoro Timer",
+    "asar": false,
     "directories": {
       "output": "dist"
     },
