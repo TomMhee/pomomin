@@ -32,35 +32,68 @@ Choose your platform:
 ## 🚀 Quick Start
 
 1. **Download** the installer for your platform
-2. **Install** the app (standard installation process)
+2. **Install** the app:
+   - **Windows**: Run the `.exe` installer
+   - **macOS**: Open the `.dmg`, drag to Applications, then [see macOS security note below](#-macos-security-note)
 3. **Add music** (optional):
    - Place `work_lofi.wav` in the app folder for work sessions
    - Place `break_lofi.wav` for break sessions
 4. **Launch** and start your first Pomodoro! 🍅
 
+### 🍎 macOS Security Note
+
+macOS may show a security warning because the app isn't code signed. This is normal for indie apps. To install:
+
+1. **Right-click** the app → **"Open"**
+2. **Click "Open"** when prompted
+3. Or go to **System Preferences** → **Security & Privacy** → **"Open Anyway"**
+
+The app is completely safe - this is just Apple's security measure for unsigned apps.
+
 ## 🎵 Adding Your Music
 
-To add your own lofi music:
+To add your own lofi music, place the files in the app's installation directory:
 
 ### Windows
+After installing with the `.exe`:
 ```
-C:\Users\[username]\AppData\Local\Programs\pomodoro-timer\
+C:\Users\[YourUsername]\AppData\Local\Programs\Pomodoro Timer\resources\app\
 ├── work_lofi.wav    (for work sessions)
 └── break_lofi.wav   (for breaks)
 ```
+
+**Quick way to find it:**
+1. Right-click the Pomodoro Timer desktop shortcut
+2. Select "Open file location"
+3. Navigate to the `resources\app\` folder
+4. Place your `.wav` files here
 
 ### macOS
+After installing with the `.dmg`:
 ```
-/Applications/Pomodoro Timer.app/Contents/Resources/
+/Applications/Pomodoro Timer.app/Contents/Resources/app/
 ├── work_lofi.wav    (for work sessions)
 └── break_lofi.wav   (for breaks)
 ```
 
-### 🎧 Music Recommendations
-- **Work**: Calm, instrumental lofi beats
-- **Breaks**: Slightly more upbeat, still relaxing
-- **Format**: WAV files work best
-- **Length**: 30+ minutes to avoid repetition
+**Quick way to find it:**
+1. Find Pomodoro Timer in Applications
+2. Right-click → "Show Package Contents"
+3. Navigate: `Contents` → `Resources` → `app`
+4. Place your `.wav` files here
+
+### 🎧 Music File Requirements
+- **Format**: `.wav` files (best compatibility)
+- **Names**: Must be exactly `work_lofi.wav` and `break_lofi.wav`
+- **Length**: 25+ minutes recommended to avoid repetition
+- **Quality**: Any quality works, but 44.1kHz 16-bit is ideal
+
+### 🎵 Music Recommendations
+- **Work sessions**: Calm, instrumental lofi beats
+- **Break sessions**: Slightly more upbeat, still relaxing
+- **Sources**: YouTube (use a converter), Spotify local files, or lofi music websites
+
+> 💡 **Tip**: Restart the app after adding music files for them to be detected
 
 ## ⌨️ Keyboard Shortcuts
 
@@ -121,3 +154,21 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Special thanks to the lofi music community for providing relaxing beats
 
 ## 💬 Support
+
+Having issues? Here's how to get help:
+
+- 🐛 **Bug reports**: [Create an issue](https://github.com/TomMhee/pomomin/issues/new)
+- 💡 **Feature requests**: [Create an issue](https://github.com/TomMhee/pomomin/issues/new)
+- 💬 **Questions**: Check existing issues or start a discussion
+
+---
+
+<div align="center">
+
+**⭐ Star this repo if it helps your productivity!**
+
+Made with ❤️ for the productivity community
+
+[Download Now](https://github.com/TomMhee/pomomin/releases/latest) • [Report Bug](https://github.com/TomMhee/pomomin/issues) • [Request Feature](https://github.com/TomMhee/pomomin/issues)
+
+</div>
