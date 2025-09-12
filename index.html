@@ -15,11 +15,13 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: #1a1a1a;
             color: #fff;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            margin: 0;
+            -webkit-app-region: no-drag;
         }
 
         .app {
@@ -29,6 +31,7 @@
             text-align: center;
             min-width: 320px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            -webkit-app-region: no-drag;
         }
 
         .timer {
@@ -112,6 +115,9 @@
         <div class="controls">
             <button class="btn primary" id="toggle">Start</button>
             <button class="btn" id="skip">Skip</button>
+            <button class="btn" id="spotify-auth">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Spotify_logo_without_text.svg/1920px-Spotify_logo_without_text.svg.png" alt="Spotify" style="height:16px;vertical-align:middle;margin-left:6px;margin-right:6px;">
+            </button>
             <button class="btn" id="reset">Reset</button>
         </div>
     </div>
@@ -147,8 +153,11 @@
                 document.getElementById('volume').oninput = (e) => {
                     this.volume = e.target.value / 100;
                     if (this.audio) this.audio.volume = this.volume;
+                }
+                document.getElementById('spotify-auth').onclick = () => {
+                    window.electronAPI.openSpotifyAuthModal();
                 };
-                
+
                 document.onkeydown = (e) => {
                     if (e.code === 'Space') {
                         e.preventDefault();
